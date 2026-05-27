@@ -13,7 +13,7 @@
 }
 
 @theme {
-  --breakpoint-w12: 1200px;
+  --breakpoint-w12: 1300px;
 }
 
 @media (prefers-color-scheme: dark) {

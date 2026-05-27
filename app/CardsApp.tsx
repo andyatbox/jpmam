@@ -134,8 +134,11 @@ export default function App() {
 
   // Right offset to align the close X with the right edge of the back-side content
   // (content is max-w-2xl=672px, mx-auto, with px-6/md:px-10/lg:px-12)
-  const contentInnerPad = dimensions.width >= 1024 ? 48 : dimensions.width >= 768 ? 40 : 24;
-  const closeXRight = Math.max(0, (activeCardWidth - 672) / 2) + contentInnerPad;
+  const backScaleValue = dimensions.width >= 768 && dimensions.width < 1300 ? 0.7 : 1;
+  // Wrapper is wider than the card so that after scale() it visually fills edge-to-edge (scaled range only)
+  const backContentWrapperWidth = activeCardWidth / backScaleValue;
+  // Absolute close X for large screens (≥1300) — aligns with lg:px-12 content padding
+  const closeXRight = dimensions.width >= 1300 ? 48 : 0;
 
   // Calculate the "gravitational center" group offset to center active card without gaps
   let groupOffset = 0;
@@ -278,7 +281,7 @@ export default function App() {
                   <div 
                     className="absolute left-0 w-full flex flex-col items-center pointer-events-none"
                     style={{ 
-                      top: dimensions.width < 1200 ? 'calc(100% - 150px)' : 'calc(100% - 200px)',
+                      top: dimensions.width < 1300 ? 'calc(100% - 150px)' : 'calc(100% - 200px)',
                       backfaceVisibility: 'hidden',
                       WebkitBackfaceVisibility: 'hidden'
                     }}
@@ -287,7 +290,7 @@ export default function App() {
                     <div className="hidden w-8 h-8 md:w-10 md:h-10 bg-white mb-2 md:mb-3" />
                     
                     <h2
-                      className="relative z-10 font-book text-center text-[10px] md:text-xs w12:text-[1.75vw]! w12:leading-[1.75vw]! px-4 py-2"
+                      className="relative z-10 font-book text-center text-[10px] md:text-xs w12:text-[1.75vw]! w12:leading-[1.75vw]! mt-3 md:mt-4 px-4 py-2"
                       style={{ 
                         writingMode: dimensions.width < 768 && !isActive ? 'vertical-rl' : 'horizontal-tb',
                         WebkitWritingMode: dimensions.width < 768 && !isActive ? 'vertical-rl' : 'horizontal-tb',
@@ -334,23 +337,34 @@ export default function App() {
                   <div 
                     className="absolute top-0 left-1/2 h-full flex flex-col justify-center pointer-events-none"
                     style={{
-                      width: `${activeCardWidth}px`,
-                      transform: 'translateX(-50%)',
-                      WebkitTransform: 'translateX(-50%)'
+                      width: `${backContentWrapperWidth}px`,
+                      transform: `translateX(-50%) scale(${backScaleValue})`,
+                      WebkitTransform: `translateX(-50%) scale(${backScaleValue})`
                     }}
                   >
-                    {/* Non-functional Close Icon - placed rigidly in the top right of the printed card back */}
-                    <div className="absolute top-16 md:top-20 text-white opacity-80 z-50" style={{ right: `${closeXRight}px` }}>
-                      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className="w-5 h-5 md:w-6 md:h-6">
-                        <line x1="18" y1="6" x2="6" y2="18"></line>
-                        <line x1="6" y1="6" x2="18" y2="18"></line>
-                      </svg>
-                    </div>
-
-                    <div className="w-full max-w-2xl mx-auto text-left px-6 md:px-10 lg:px-12">
-                      <h3 className="text-lg md:text-xl xl:text-3xl mb-4 md:mb-6 text-white">
-                        {card.title}
-                      </h3>
+                    <div className="w-full text-left px-2 md:px-3 lg:px-12">
+                      {/* Large screens: absolute X top-right; scaled range: inline with title */}
+                      {dimensions.width >= 1300 && (
+                        <div className="absolute top-16 md:top-20 text-white opacity-80 z-50" style={{ right: `${closeXRight}px` }}>
+                          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className="w-5 h-5 md:w-6 md:h-6">
+                            <line x1="18" y1="6" x2="6" y2="18"></line>
+                            <line x1="6" y1="6" x2="18" y2="18"></line>
+                          </svg>
+                        </div>
+                      )}
+                      <div className="flex items-start justify-between mb-4 md:mb-6">
+                        <h3 className="text-lg md:text-xl xl:text-3xl text-white">
+                          {card.title}
+                        </h3>
+                        {dimensions.width < 1300 && (
+                          <div className="text-white opacity-80 shrink-0 ml-4">
+                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className="w-5 h-5 md:w-6 md:h-6">
+                              <line x1="18" y1="6" x2="6" y2="18"></line>
+                              <line x1="6" y1="6" x2="18" y2="18"></line>
+                            </svg>
+                          </div>
+                        )}
+                      </div>
                       
                       <p className="text-white/90 text-xs md:text-sm xl:text-lg mb-5 md:mb-6">
                         {card.paragraph}
