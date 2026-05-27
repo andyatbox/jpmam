@@ -1,0 +1,406 @@
+'use client';
+
+import React, { useState, useEffect, useRef } from 'react';
+
+// Defines the 7 distinct cards with Unsplash image URLs
+const CARDS = [
+  {
+    id: 1,
+    image: '/infrastructure.jpg',
+    title: 'Infrastructure',
+    paragraph:
+      'Our team makes long-term investments across the world’s largest core infrastructure markets, investing at scale in essential service assets to deliver core outcomes. We primarily target investments in contracted and regulated essential services.',
+    stats: [
+      { value: '$91B', label: 'in assets under management' },
+      { value: '18', label: 'portfolio companies with over 1,000 assets' },
+      { value: '19+', label: 'years of experience managing private infrastructure' },
+    ],
+  },
+  {
+    id: 2,
+    image: '/transport.jpg',
+    title: 'Transport',
+    paragraph:
+      'We manage income-oriented investments targeting large, supply-chain-critical assets with long duration leases and inflation protection mechanisms.',
+    stats: [
+      { value: '$14B', label: 'in assets under management' },
+      { value: '150+', label: 'investments' },
+      { value: '15+', label: 'years managing transport' },
+    ],
+  },
+  {
+    id: 3,
+    image: '/timberland.jpg',
+    title: 'Timberland',
+    paragraph:
+      'We manage a timberland investment strategy for investors looking for portfolio diversification, inflation risk management and income benefits of investing in forestlands, while also capturing carbon and generating verified carbon assets (VCAs).',
+    stats: [
+      { value: '$11B', label: 'in assets under management' },
+      { value: '1.5M+', label: 'acres under management across three continents' },
+      { value: '40+', label: 'years of experience in timberland management' },
+    ],
+  },
+  {
+    id: 4,
+    image: '/private-equity.jpg',
+    title: 'Private Equity',
+    paragraph:
+      'A bottom-up, opportunistic investment approach seeking the highest conviction ideas from venture to buyout across primaries, secondaries and co-investments with a focus on the small-mid market.',
+    stats: [
+      { value: '$37B', label: 'in assets under management' },
+      { value: '45+', label: 'years’ experience' },
+      { value: '260+', label: 'GP relationships' },
+    ],
+  },
+  {
+    id: 5,
+    image: '/private-credit.jpg',
+    title: 'Private Credit',
+    paragraph:
+      'We have dedicated private credit professionals with extensive experience and specialized expertise. We offer a spectrum of private credit strategies and solutions to meet client objectives covering direct lending, private credit secondaries, and opportunistic special situations.',
+    stats: [
+      { value: '$22B', label: 'in assets under management' },
+      { value: '65', label: 'years managing capital through cycles' },
+      { value: '10+', label: 'strategies focused only on private credit' },
+    ],
+  },
+  {
+    id: 6,
+    image: '/real-estate.jpg',
+    title: 'Real Estate',
+    paragraph:
+      'Our platform delivers a distinct information advantage through deep market expertise and comprehensive data insights. We employ a disciplined, integrated investment process that encourages innovation and enables us to invest across the full real estate risk spectrum.',
+    stats: [
+      { value: '$71B', label: 'of assets under management' },
+      { value: '65', label: 'years managing real estate strategies' },
+      { value: '67', label: 'markets and 365+ investments' },
+    ],
+  },
+  {
+    id: 7,
+    image: '/hedge-funds.jpg',
+    title: 'Hedge Funds',
+    paragraph:
+      'We provide niche hedge fund strategies and customized solutions across the liquidity spectrum to help investors achieve their strategic investment objectives, leveraging the scale of J.P. Morgan’s platform to secure scarce capacity and negotiate competitive terms.',
+    stats: [
+      { value: '$26B', label: 'in assets under management' },
+      { value: '30', label: 'years managing hedge fund strategies' },
+      { value: '100+', label: 'dedicated professionals globally' },
+    ],
+  },
+];
+
+export default function App() {
+  const [dimensions, setDimensions] = useState({ width: 0, height: 0 });
+  const [activeCard, setActiveCard] = useState<number | null>(null);
+  const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  // Initialize and handle window resize
+  useEffect(() => {
+    const handleResize = () => {
+      setDimensions({ width: window.innerWidth, height: window.innerHeight });
+    };
+
+    handleResize();
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
+
+  // Handle the auto-revert timer
+  useEffect(() => {
+    if (timerRef.current) clearTimeout(timerRef.current);
+    
+    if (activeCard !== null) {
+      timerRef.current = setTimeout(() => {
+        setActiveCard(null);
+      }, 12000); // Doubled from original 6000ms to 12000ms
+    }
+    
+    return () => {
+      if (timerRef.current) clearTimeout(timerRef.current);
+    };
+  }, [activeCard]);
+
+  // Prevent render before dimensions are acquired to avoid layout flash
+  if (dimensions.width === 0) {
+    return <div className="w-screen h-screen bg-black" />;
+  }
+
+  // Core calculations based on window dimensions
+  const cardHeight = Math.max(200, dimensions.height - 300);
+  const defaultCardWidth = dimensions.width / CARDS.length;
+  // Make the active card a perfect square (width = height), capped to viewport width
+  const activeCardWidth = Math.min(cardHeight, dimensions.width);
+
+  // Right offset to align the close X with the right edge of the back-side content
+  // (content is max-w-2xl=672px, mx-auto, with px-6/md:px-10/lg:px-12)
+  const contentInnerPad = dimensions.width >= 1024 ? 48 : dimensions.width >= 768 ? 40 : 24;
+  const closeXRight = Math.max(0, (activeCardWidth - 672) / 2) + contentInnerPad;
+
+  // Calculate the "gravitational center" group offset to center active card without gaps
+  let groupOffset = 0;
+  if (activeCard !== null) {
+    const totalW = (CARDS.length - 1) * defaultCardWidth + activeCardWidth;
+    const activeRelativeLeft = activeCard * defaultCardWidth;
+    const activeCenterRel = activeRelativeLeft + (activeCardWidth / 2);
+    const idealOffset = (dimensions.width / 2) - activeCenterRel;
+
+    let maxOffset = 0; // Group's left edge cannot go right of 0
+    let minOffset = dimensions.width - totalW; // Group's right edge cannot go left of viewport width
+    
+    // Fallback just in case the screen is wildly wide and the cards don't fill it
+    if (minOffset > maxOffset) {
+      minOffset = (dimensions.width - totalW) / 2;
+      maxOffset = minOffset;
+    }
+
+    // Clamp the offset so it gets as close to ideal as possible without showing gaps
+    groupOffset = Math.max(minOffset, Math.min(maxOffset, idealOffset));
+  }
+
+  // Extremely fluid, cinematic easing curve (smooth ease-out without the hard bounce)
+  const physicsBezier = 'cubic-bezier(0.25, 1, 0.2, 1)';
+
+  return (
+    <div className="fixed inset-0 w-screen h-screen bg-black overflow-hidden select-none font-sans text-white">
+      
+      {/* Top Fixed Element */}
+      <div 
+        className="fixed top-0 left-0 w-full h-[250px] pointer-events-none z-[100]"
+        style={{ 
+          filter: 'drop-shadow(0 15px 15px rgba(0,0,0,0.8))',
+          WebkitFilter: 'drop-shadow(0 15px 15px rgba(0,0,0,0.8))'
+        }}
+      >
+        <div 
+          className="w-full h-full flex items-center justify-center"
+          aria-hidden="true"
+          style={{
+            backgroundImage: "url('/top-bg.jpg')",
+            backgroundSize: 'cover',
+            backgroundPosition: 'center',
+            clipPath: 'polygon(0% 0%, 100% 0%, 100% 80%, 0% 100%)',
+            WebkitClipPath: 'polygon(0% 0%, 100% 0%, 100% 80%, 0% 100%)'
+          }}
+        >
+          <img src="/logo.svg" alt="Logo" className="w-[85%] max-w-[1500px] h-auto" />
+        </div>
+      </div>
+
+      {/* Main 3D Context Container */}
+      <div 
+        className="relative w-full h-full" 
+        style={{ 
+          perspective: '1200px',
+          WebkitPerspective: '1200px'
+        }} 
+      >
+        {CARDS.map((card, index) => {
+          const isActive = activeCard === index;
+          const isFlipped = isActive;
+          
+          let leftPosition = 0;
+          let cardWidth = defaultCardWidth;
+
+          // Calculate precise X coordinates based on gravitational centering
+          if (activeCard === null) {
+            leftPosition = index * defaultCardWidth;
+          } else {
+            let relativeLeft = 0;
+            
+            // Calculate where this card sits relative to the start of the card group
+            if (index < activeCard) {
+              relativeLeft = index * defaultCardWidth;
+              cardWidth = defaultCardWidth;
+            } else if (index === activeCard) {
+              relativeLeft = index * defaultCardWidth;
+              cardWidth = activeCardWidth;
+            } else {
+              relativeLeft = (activeCard * defaultCardWidth) + activeCardWidth + ((index - activeCard - 1) * defaultCardWidth);
+              cardWidth = defaultCardWidth;
+            }
+            
+            // Apply the clamped group offset to position it on screen
+            leftPosition = groupOffset + relativeLeft;
+          }
+
+          return (
+            <div
+              key={card.id}
+              onClick={() => setActiveCard(isActive ? null : index)}
+              className="absolute cursor-pointer"
+              style={{
+                top: '200px',
+                left: `${leftPosition}px`,
+                width: `${cardWidth + 1}px`, // +1px to prevent fractional sub-pixel gaps between cards
+                height: `${cardHeight}px`,
+                zIndex: isActive ? 40 : 10,
+                // Apply the highly fluid ease and doubled 2.4s duration
+                transition: `all 2.4s ${physicsBezier}`,
+                WebkitTransition: `all 2.4s ${physicsBezier}`
+              }}
+            >
+              {/* Inner 3D Flip Wrapper */}
+              <div
+                className="w-full h-full relative"
+                style={{
+                  transformStyle: 'preserve-3d',
+                  WebkitTransformStyle: 'preserve-3d',
+                  // The flip animation with a slight scale increase when active
+                  transform: isFlipped ? 'rotateY(180deg) scale(1.05)' : 'rotateY(0deg) scale(1)',
+                  WebkitTransform: isFlipped ? 'rotateY(180deg) scale(1.05)' : 'rotateY(0deg) scale(1)',
+                  // Sharp, realistic elevation drop shadow only when active
+                  boxShadow: isActive ? '0 30px 60px -15px rgba(0,0,0,0.8), 0 20px 30px -10px rgba(0,0,0,0.6)' : 'none',
+                  WebkitBoxShadow: isActive ? '0 30px 60px -15px rgba(0,0,0,0.8), 0 20px 30px -10px rgba(0,0,0,0.6)' : 'none',
+                  transition: `transform 2.4s ${physicsBezier}, box-shadow 2.4s ${physicsBezier}`,
+                  WebkitTransition: `-webkit-transform 2.4s ${physicsBezier}, -webkit-box-shadow 2.4s ${physicsBezier}`
+                }}
+              >
+                {/* --- FRONT SIDE --- */}
+                <div
+                  className="absolute inset-0 w-full h-full overflow-hidden"
+                  style={{
+                    backgroundImage: `url(${card.image})`,
+                    backgroundSize: 'cover',
+                    backgroundPosition: 'center',
+                    backfaceVisibility: 'hidden',
+                    WebkitBackfaceVisibility: 'hidden',
+                    // WebKit iOS fix: explicit Z-layering to prevent bleed-through
+                    transform: 'translateZ(1px)',
+                    WebkitTransform: 'translateZ(1px)',
+                  }}
+                >
+                  {/* Bottom-to-center transparent black gradient */}
+                  <div 
+                    className="absolute inset-0 pointer-events-none" 
+                    style={{ background: 'linear-gradient(to top, rgba(0,0,0,0.75) 0%, rgba(0,0,0,0) 50%)' }}
+                  />
+                  <div 
+                    className="absolute left-0 w-full flex flex-col items-center pointer-events-none"
+                    style={{ 
+                      top: dimensions.width < 1200 ? 'calc(100% - 150px)' : 'calc(100% - 200px)',
+                      backfaceVisibility: 'hidden',
+                      WebkitBackfaceVisibility: 'hidden'
+                    }}
+                  >
+                    {/* White Square Icon Placeholder */}
+                    <div className="hidden w-8 h-8 md:w-10 md:h-10 bg-white mb-2 md:mb-3" />
+                    
+                    <h2
+                      className="relative z-10 font-book text-center text-[10px] md:text-xs w12:text-[1.75vw]! w12:leading-[1.75vw]! px-4 py-2"
+                      style={{ 
+                        writingMode: dimensions.width < 768 && !isActive ? 'vertical-rl' : 'horizontal-tb',
+                        WebkitWritingMode: dimensions.width < 768 && !isActive ? 'vertical-rl' : 'horizontal-tb',
+                        // WebKit iOS fix: Force hardware acceleration on the child transform and hide backface explicitly
+                        transform: dimensions.width < 768 && !isActive ? 'rotate(180deg) translateZ(0)' : 'translateZ(0)',
+                        WebkitTransform: dimensions.width < 768 && !isActive ? 'rotate(180deg) translateZ(0)' : 'translateZ(0)',
+                        backfaceVisibility: 'hidden',
+                        WebkitBackfaceVisibility: 'hidden'
+                      }}
+                    >
+                      {card.title}
+                    </h2>
+                  </div>
+                </div>
+
+                {/* --- BACK SIDE --- */}
+                <div
+                  className="absolute inset-0 w-full h-full overflow-hidden"
+                  style={{
+                    backgroundImage: `url(${card.image})`,
+                    backgroundSize: 'cover',
+                    backgroundPosition: 'center',
+                    backfaceVisibility: 'hidden',
+                    WebkitBackfaceVisibility: 'hidden',
+                    // WebKit iOS fix: positive translateZ on the flipped face ensures proper depth sorting
+                    transform: 'rotateY(180deg) translateZ(1px)',
+                    WebkitTransform: 'rotateY(180deg) translateZ(1px)',
+                  }}
+                >
+                  {/* Backdrop blur with 50% transparent black tint */}
+                  <div 
+                    className="absolute inset-0 bg-black/50 pointer-events-none" 
+                    style={{
+                      backdropFilter: 'blur(9px)',
+                      WebkitBackdropFilter: 'blur(9px)'
+                    }}
+                  />
+                  
+                  {/* To create a perfectly real "printed" effect, we constrain the inner content 
+                    to the exact size it will be when fully open. As the card width animates, 
+                    this div stays rigid and is simply clipped by the parent's overflow, 
+                    creating the illusion of a solid card rotating. No fading allowed!
+                  */}
+                  <div 
+                    className="absolute top-0 left-1/2 h-full flex flex-col justify-center pointer-events-none"
+                    style={{
+                      width: `${activeCardWidth}px`,
+                      transform: 'translateX(-50%)',
+                      WebkitTransform: 'translateX(-50%)'
+                    }}
+                  >
+                    {/* Non-functional Close Icon - placed rigidly in the top right of the printed card back */}
+                    <div className="absolute top-16 md:top-20 text-white opacity-80 z-50" style={{ right: `${closeXRight}px` }}>
+                      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className="w-5 h-5 md:w-6 md:h-6">
+                        <line x1="18" y1="6" x2="6" y2="18"></line>
+                        <line x1="6" y1="6" x2="18" y2="18"></line>
+                      </svg>
+                    </div>
+
+                    <div className="w-full max-w-2xl mx-auto text-left px-6 md:px-10 lg:px-12">
+                      <h3 className="text-lg md:text-xl xl:text-3xl mb-4 md:mb-6 text-white">
+                        {card.title}
+                      </h3>
+                      
+                      <p className="text-white/90 text-xs md:text-sm xl:text-lg mb-5 md:mb-6">
+                        {card.paragraph}
+                      </p>
+
+                      {/* Stats Grid - 3 columns, always side-by-side. */}
+                      <div className="grid grid-cols-3 gap-3 md:gap-6 w-full">
+                        {card.stats.map((stat, i) => (
+                          <div key={i} className={`p-2 sm:p-4 ${i === 0 ? 'pl-0 sm:pl-0' : ''}`}>
+                            <div className="text-2xl md:text-3xl xl:text-4xl text-white mb-1">{stat.value}</div>
+                            <div className="font-book text-[10px] md:text-xs xl:text-sm text-white/70">{stat.label}</div>
+                          </div>
+                        ))}
+                      </div>
+
+                      {/* Disclaimer Text */}
+                      <div className="font-book mt-4 md:mt-6 text-[10px] xl:text-xs text-white/50 tracking-wide">
+                        All data as of 12/31/2025
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                
+              </div>
+            </div>
+          );
+        })}
+      </div>
+
+      {/* Bottom Fixed Element */}
+      <div 
+        className="fixed bottom-0 left-0 w-full h-[150px] pointer-events-none z-[100]"
+        style={{ 
+          filter: 'drop-shadow(0 -15px 15px rgba(0,0,0,0.8))',
+          WebkitFilter: 'drop-shadow(0 -15px 15px rgba(0,0,0,0.8))'
+        }}
+      >
+        <div 
+          className="w-full h-full"
+          aria-hidden="true"
+          style={{
+            backgroundImage: "url('/bottom-bg.jpg')",
+            backgroundSize: 'cover',
+            backgroundPosition: 'center',
+            clipPath: 'polygon(100% 100%, 0% 100%, 0% 30%, 100% 0%)',
+            WebkitClipPath: 'polygon(100% 100%, 0% 100%, 0% 30%, 100% 0%)'
+          }}
+        />
+      </div>
+      
+    </div>
+  );
+}
