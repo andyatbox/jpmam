@@ -290,10 +290,8 @@ export default function App() {
                     <div className="hidden w-8 h-8 md:w-10 md:h-10 bg-white mb-2 md:mb-3" />
                     
                     <h2
-                      className="relative z-10 font-book text-center mt-3 md:mt-4 px-4 py-2"
+                      className="relative z-10 font-book text-center text-[10px] md:text-xs min-[1300px]:text-[1.75vw]! min-[1300px]:leading-[1.75vw]! mt-3 md:mt-4 px-4 py-2"
                       style={{
-                        fontSize: dimensions.width >= 1300 ? '1.75vw' : dimensions.width >= 768 ? '0.75rem' : '10px',
-                        lineHeight: dimensions.width >= 1300 ? '1.75vw' : undefined,
                         writingMode: dimensions.width < 768 && !isActive ? 'vertical-rl' : 'horizontal-tb',
                         WebkitWritingMode: dimensions.width < 768 && !isActive ? 'vertical-rl' : 'horizontal-tb',
                         transform: dimensions.width < 768 && !isActive ? 'rotate(180deg) translateZ(0)' : 'translateZ(0)',
