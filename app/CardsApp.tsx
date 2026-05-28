@@ -137,7 +137,11 @@ export default function App() {
   const toggleAutoPlay = () => {
     const turningOff = autoPlayEnabled;
     setAutoPlayEnabled(prev => !prev);
-    if (turningOff) setActiveCard(null); // immediately reset to default on toggle off
+    if (turningOff) {
+      setActiveCard(null);
+    } else {
+      setActiveCard(0); // begin autoplay immediately from card 1
+    }
   };
 
   // Prevent render before dimensions are acquired to avoid layout flash
