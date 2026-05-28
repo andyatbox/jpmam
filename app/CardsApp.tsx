@@ -95,15 +95,12 @@ const AUTOPLAY_DELAY = 6000;
 export default function App() {
   const [dimensions, setDimensions] = useState({ width: 0, height: 0 });
   const [activeCard, setActiveCard] = useState<number | null>(null);
-  // true = auto-play running; false = user has taken control
-  const [autoPlay, setAutoPlay] = useState(true);
+  const [autoPlayEnabled, setAutoPlayEnabled] = useState(true);
+  const [allFlipped, setAllFlipped] = useState(false);
   const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const clearTimer = () => {
-    if (timerRef.current) {
-      clearTimeout(timerRef.current);
-      timerRef.current = null;
-    }
+    if (timerRef.current) { clearTimeout(timerRef.current); timerRef.current = null; }
   };
 
   // Window resize
@@ -116,33 +113,36 @@ export default function App() {
     return () => window.removeEventListener('resize', handleResize);
   }, []);
 
-  // Auto-play: advance through cards sequentially, looping
+  // Single timer effect — behaviour depends on autoPlayEnabled / allFlipped state
   useEffect(() => {
-    if (!autoPlay) return;
     clearTimer();
-    timerRef.current = setTimeout(() => {
-      setActiveCard(prev => prev === null ? 0 : (prev + 1) % CARDS.length);
-    }, AUTOPLAY_DELAY);
-    return clearTimer;
-  }, [autoPlay, activeCard]);
 
-  // After user interaction: resume auto-play on the next card after 6s idle
-  useEffect(() => {
-    if (autoPlay) return;
-    clearTimer();
-    if (activeCard !== null) {
+    if (autoPlayEnabled) {
+      // Sequential autoplay: advance every 6s (also resumes after user click)
       timerRef.current = setTimeout(() => {
-        setAutoPlay(true);
         setActiveCard(prev => prev === null ? 0 : (prev + 1) % CARDS.length);
       }, AUTOPLAY_DELAY);
+    } else if (!allFlipped) {
+      // Autoplay OFF: after 13s idle flip all cards simultaneously
+      timerRef.current = setTimeout(() => {
+        setActiveCard(null);
+        setAllFlipped(true);
+      }, 13000);
     }
+
     return clearTimer;
-  }, [autoPlay, activeCard]);
+  }, [autoPlayEnabled, activeCard, allFlipped]);
 
   const handleCardClick = (index: number) => {
     const isActive = activeCard === index;
-    setAutoPlay(false);
+    setAllFlipped(false);
     setActiveCard(isActive ? null : index);
+    // Keep autoPlayEnabled as-is; when ON the effect will resume after 6s
+  };
+
+  const toggleAutoPlay = () => {
+    setAutoPlayEnabled(prev => !prev);
+    setAllFlipped(false);
   };
 
   // Prevent render before dimensions are acquired to avoid layout flash
@@ -153,8 +153,10 @@ export default function App() {
   // Core calculations based on window dimensions
   const cardHeight = Math.max(200, dimensions.height - 300);
   const defaultCardWidth = dimensions.width / CARDS.length;
-  // Make the active card a perfect square (width = height), capped to viewport width
   const activeCardWidth = Math.min(cardHeight, dimensions.width);
+  // Matches the logo's horizontal centering margin for toggle alignment
+  const logoWidth = Math.min(dimensions.width * 0.85, 1500);
+  const logoHorizontalMargin = (dimensions.width - logoWidth) / 2;
 
   // Right offset to align the close X with the right edge of the back-side content
   // (content is max-w-2xl=672px, mx-auto, with px-6/md:px-10/lg:px-12)
@@ -224,7 +226,7 @@ export default function App() {
       >
         {CARDS.map((card, index) => {
           const isActive = activeCard === index;
-          const isFlipped = isActive;
+          const isFlipped = isActive || allFlipped;
           
           let leftPosition = 0;
           let cardWidth = defaultCardWidth;
@@ -418,14 +420,14 @@ export default function App() {
       </div>
 
       {/* Bottom Fixed Element */}
-      <div 
+      <div
         className="fixed bottom-0 left-0 w-full h-[150px] pointer-events-none z-[100]"
-        style={{ 
+        style={{
           filter: 'drop-shadow(0 -15px 15px rgba(0,0,0,0.8))',
           WebkitFilter: 'drop-shadow(0 -15px 15px rgba(0,0,0,0.8))'
         }}
       >
-        <div 
+        <div
           className="w-full h-full"
           aria-hidden="true"
           style={{
@@ -436,6 +438,21 @@ export default function App() {
             WebkitClipPath: 'polygon(100% 100%, 0% 100%, 0% 30%, 100% 0%)'
           }}
         />
+        {/* Autoplay toggle — vertically centered, right-aligned to match logo right edge */}
+        <div
+          className="absolute inset-0 flex items-center justify-end"
+          style={{ paddingRight: `${logoHorizontalMargin}px` }}
+        >
+          <button
+            onClick={toggleAutoPlay}
+            className="flex items-center gap-2 text-white pointer-events-auto"
+          >
+            <span className="font-book text-sm">Autoplay</span>
+            <div className={`relative w-10 h-5 rounded-full transition-colors duration-300 ${autoPlayEnabled ? 'bg-white' : 'bg-white/30'}`}>
+              <div className={`absolute top-0.5 left-0.5 w-4 h-4 rounded-full transition-transform duration-300 ${autoPlayEnabled ? 'bg-black translate-x-5' : 'bg-white translate-x-0'}`} />
+            </div>
+          </button>
+        </div>
       </div>
       
     </div>
