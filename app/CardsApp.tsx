@@ -96,7 +96,6 @@ export default function App() {
   const [dimensions, setDimensions] = useState({ width: 0, height: 0 });
   const [activeCard, setActiveCard] = useState<number | null>(null);
   const [autoPlayEnabled, setAutoPlayEnabled] = useState(true);
-  const [allFlipped, setAllFlipped] = useState(false);
   const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const clearTimer = () => {
@@ -113,36 +112,32 @@ export default function App() {
     return () => window.removeEventListener('resize', handleResize);
   }, []);
 
-  // Single timer effect — behaviour depends on autoPlayEnabled / allFlipped state
+  // Timer effect
   useEffect(() => {
     clearTimer();
-
     if (autoPlayEnabled) {
-      // Sequential autoplay: advance every 6s (also resumes after user click)
+      // Sequential autoplay: advance every 6s
       timerRef.current = setTimeout(() => {
         setActiveCard(prev => prev === null ? 0 : (prev + 1) % CARDS.length);
       }, AUTOPLAY_DELAY);
-    } else if (!allFlipped) {
-      // Autoplay OFF: after 13s idle flip all cards simultaneously
+    } else {
+      // Autoplay OFF: after 13s idle, close any open card back to default
       timerRef.current = setTimeout(() => {
         setActiveCard(null);
-        setAllFlipped(true);
       }, 13000);
     }
-
     return clearTimer;
-  }, [autoPlayEnabled, activeCard, allFlipped]);
+  }, [autoPlayEnabled, activeCard]);
 
   const handleCardClick = (index: number) => {
     const isActive = activeCard === index;
-    setAllFlipped(false);
     setActiveCard(isActive ? null : index);
-    // Keep autoPlayEnabled as-is; when ON the effect will resume after 6s
   };
 
   const toggleAutoPlay = () => {
+    const turningOff = autoPlayEnabled;
     setAutoPlayEnabled(prev => !prev);
-    setAllFlipped(false);
+    if (turningOff) setActiveCard(null); // immediately reset to default on toggle off
   };
 
   // Prevent render before dimensions are acquired to avoid layout flash
@@ -226,7 +221,7 @@ export default function App() {
       >
         {CARDS.map((card, index) => {
           const isActive = activeCard === index;
-          const isFlipped = isActive || allFlipped;
+          const isFlipped = isActive;
           
           let leftPosition = 0;
           let cardWidth = defaultCardWidth;
