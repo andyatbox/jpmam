@@ -90,36 +90,60 @@ const CARDS = [
   },
 ];
 
+const AUTOPLAY_DELAY = 6000;
+
 export default function App() {
   const [dimensions, setDimensions] = useState({ width: 0, height: 0 });
   const [activeCard, setActiveCard] = useState<number | null>(null);
+  // true = auto-play running; false = user has taken control
+  const [autoPlay, setAutoPlay] = useState(true);
   const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
-  // Initialize and handle window resize
+  const clearTimer = () => {
+    if (timerRef.current) {
+      clearTimeout(timerRef.current);
+      timerRef.current = null;
+    }
+  };
+
+  // Window resize
   useEffect(() => {
     const handleResize = () => {
       setDimensions({ width: window.innerWidth, height: window.innerHeight });
     };
-
     handleResize();
     window.addEventListener('resize', handleResize);
     return () => window.removeEventListener('resize', handleResize);
   }, []);
 
-  // Handle the auto-revert timer
+  // Auto-play: advance through cards sequentially, looping
   useEffect(() => {
-    if (timerRef.current) clearTimeout(timerRef.current);
-    
+    if (!autoPlay) return;
+    clearTimer();
+    timerRef.current = setTimeout(() => {
+      setActiveCard(prev => prev === null ? 0 : (prev + 1) % CARDS.length);
+    }, AUTOPLAY_DELAY);
+    return clearTimer;
+  }, [autoPlay, activeCard]);
+
+  // After user interaction: resume auto-play on the next card after 6s idle
+  useEffect(() => {
+    if (autoPlay) return;
+    clearTimer();
     if (activeCard !== null) {
       timerRef.current = setTimeout(() => {
-        setActiveCard(null);
-      }, 12000); // Doubled from original 6000ms to 12000ms
+        setAutoPlay(true);
+        setActiveCard(prev => prev === null ? 0 : (prev + 1) % CARDS.length);
+      }, AUTOPLAY_DELAY);
     }
-    
-    return () => {
-      if (timerRef.current) clearTimeout(timerRef.current);
-    };
-  }, [activeCard]);
+    return clearTimer;
+  }, [autoPlay, activeCard]);
+
+  const handleCardClick = (index: number) => {
+    const isActive = activeCard === index;
+    setAutoPlay(false);
+    setActiveCard(isActive ? null : index);
+  };
 
   // Prevent render before dimensions are acquired to avoid layout flash
   if (dimensions.width === 0) {
@@ -230,7 +254,7 @@ export default function App() {
           return (
             <div
               key={card.id}
-              onClick={() => setActiveCard(isActive ? null : index)}
+              onClick={() => handleCardClick(index)}
               className="absolute cursor-pointer"
               style={{
                 top: '200px',

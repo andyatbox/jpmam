@@ -21,7 +21,7 @@ const jpmamBook = localFont({
 });
 
 export const metadata: Metadata = {
-  title: "JPMAM Cards",
+  title: "J.P.Morgan Asset Management",
   description: "Flip-card interactive layout",
 };
 
