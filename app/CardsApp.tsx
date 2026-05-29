@@ -405,6 +405,11 @@ export default function App() {
                       <div className="grid grid-cols-3 gap-3 md:gap-6 w-full">
                         {card.stats.map((stat, i) => (
                           <div key={i} className={`p-2 sm:p-4 ${i === 0 ? 'pl-0 sm:pl-0' : ''}`}>
+                            {/* Two stacked strokes: black full-width base, blue 50% on top */}
+                            <div className="relative w-full" style={{ height: '2px', marginBottom: '20px' }}>
+                              <div className="absolute inset-0 bg-black" />
+                              <div className="absolute left-0 top-0 h-full w-1/2" style={{ backgroundColor: '#52d8e6' }} />
+                            </div>
                             <div className="text-2xl md:text-3xl xl:text-4xl text-white mb-1">{stat.value}</div>
                             <div className="font-book text-[10px] md:text-xs xl:text-sm text-white/70">{stat.label}</div>
                           </div>
