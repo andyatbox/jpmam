@@ -2,54 +2,29 @@
 
 import React, { useState, useEffect, useRef } from 'react';
 
-// Defines the 7 distinct cards with Unsplash image URLs
 const CARDS = [
+  {
+    id: 7,
+    image: '/hedge-funds.jpg',
+    title: 'Hedge Funds',
+    paragraph:
+      "We provide niche hedge fund strategies and customized solutions across the liquidity spectrum to help investors achieve their strategic investment objectives, leveraging the scale of J.P. Morgan's platform to secure scarce capacity and negotiate competitive terms.",
+    stats: [
+      { value: '$26B', label: 'in assets under management' },
+      { value: '30', label: 'years managing hedge fund strategies' },
+      { value: '100+', label: 'dedicated professionals globally' },
+    ],
+  },
   {
     id: 1,
     image: '/infrastructure.jpg',
     title: 'Infrastructure',
     paragraph:
-      'Our team makes long-term investments across the world’s largest core infrastructure markets, investing at scale in essential service assets to deliver core outcomes. We primarily target investments in contracted and regulated essential services.',
+      "Our team makes long-term investments across the world's largest core infrastructure markets, investing at scale in essential service assets to deliver core outcomes. We primarily target investments in contracted and regulated essential services.",
     stats: [
       { value: '$91B', label: 'in assets under management' },
       { value: '18', label: 'portfolio companies with over 1,000 assets' },
       { value: '19+', label: 'years of experience managing private infrastructure' },
-    ],
-  },
-  {
-    id: 2,
-    image: '/transport.jpg',
-    title: 'Transport',
-    paragraph:
-      'We manage income-oriented investments targeting large, supply-chain-critical assets with long duration leases and inflation protection mechanisms.',
-    stats: [
-      { value: '$14B', label: 'in assets under management' },
-      { value: '150+', label: 'investments' },
-      { value: '15+', label: 'years managing transport' },
-    ],
-  },
-  {
-    id: 3,
-    image: '/timberland.jpg',
-    title: 'Timberland',
-    paragraph:
-      'We manage a timberland investment strategy for investors looking for portfolio diversification, inflation risk management and income benefits of investing in forestlands, while also capturing carbon and generating verified carbon assets (VCAs).',
-    stats: [
-      { value: '$11B', label: 'in assets under management' },
-      { value: '1.5M+', label: 'acres under management across three continents' },
-      { value: '40+', label: 'years of experience in timberland management' },
-    ],
-  },
-  {
-    id: 4,
-    image: '/private-equity.jpg',
-    title: 'Private Equity',
-    paragraph:
-      'A bottom-up, opportunistic investment approach seeking the highest conviction ideas from venture to buyout across primaries, secondaries and co-investments with a focus on the small-mid market.',
-    stats: [
-      { value: '$37B', label: 'in assets under management' },
-      { value: '45+', label: 'years’ experience' },
-      { value: '260+', label: 'GP relationships' },
     ],
   },
   {
@@ -65,6 +40,42 @@ const CARDS = [
     ],
   },
   {
+    id: 4,
+    image: '/private-equity.jpg',
+    title: 'Private Equity',
+    paragraph:
+      'A bottom-up, opportunistic investment approach seeking the highest conviction ideas from venture to buyout across primaries, secondaries and co-investments with a focus on the small-mid market.',
+    stats: [
+      { value: '$37B', label: 'in assets under management' },
+      { value: '45+', label: "years' experience" },
+      { value: '260+', label: 'GP relationships' },
+    ],
+  },
+  {
+    id: 3,
+    image: '/timberland.jpg',
+    title: 'Timberland',
+    paragraph:
+      'We manage a timberland investment strategy for investors looking for portfolio diversification, inflation risk management and income benefits of investing in forestlands, while also capturing carbon and generating verified carbon assets (VCAs).',
+    stats: [
+      { value: '$11B', label: 'in assets under management' },
+      { value: '1.5M+', label: 'acres under management across three continents' },
+      { value: '40+', label: 'years of experience in timberland management' },
+    ],
+  },
+  {
+    id: 2,
+    image: '/transport.jpg',
+    title: 'Transport',
+    paragraph:
+      'We manage income-oriented investments targeting large, supply-chain-critical assets with long duration leases and inflation protection mechanisms.',
+    stats: [
+      { value: '$14B', label: 'in assets under management' },
+      { value: '150+', label: 'investments' },
+      { value: '15+', label: 'years managing transport' },
+    ],
+  },
+  {
     id: 6,
     image: '/real-estate.jpg',
     title: 'Real Estate',
@@ -76,18 +87,6 @@ const CARDS = [
       { value: '67', label: 'markets and 365+ investments' },
     ],
   },
-  {
-    id: 7,
-    image: '/hedge-funds.jpg',
-    title: 'Hedge Funds',
-    paragraph:
-      'We provide niche hedge fund strategies and customized solutions across the liquidity spectrum to help investors achieve their strategic investment objectives, leveraging the scale of J.P. Morgan’s platform to secure scarce capacity and negotiate competitive terms.',
-    stats: [
-      { value: '$26B', label: 'in assets under management' },
-      { value: '30', label: 'years managing hedge fund strategies' },
-      { value: '100+', label: 'dedicated professionals globally' },
-    ],
-  },
 ];
 
 const AUTOPLAY_DELAY = 6000;
@@ -96,6 +95,7 @@ export default function App() {
   const [dimensions, setDimensions] = useState({ width: 0, height: 0 });
   const [activeCard, setActiveCard] = useState<number | null>(null);
   const [autoPlayEnabled, setAutoPlayEnabled] = useState(true);
+  const [showDisclosure, setShowDisclosure] = useState(false);
   const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const clearTimer = () => {
@@ -311,11 +311,8 @@ export default function App() {
                       WebkitBackfaceVisibility: 'hidden'
                     }}
                   >
-                    {/* White Square Icon Placeholder */}
-                    <div className="hidden w-8 h-8 md:w-10 md:h-10 bg-white mb-2 md:mb-3" />
-                    
                     <h2
-                      className="relative z-10 font-book text-center text-[10px] md:text-[1.75vw] md:leading-[1.75vw] mt-3 md:mt-4 px-4 py-2"
+                      className="relative z-10 font-book text-center text-[10px] md:text-[1.75vw] md:leading-[1.75vw] px-4 py-2"
                       style={{
                         writingMode: dimensions.width < 768 && !isActive ? 'vertical-rl' : 'horizontal-tb',
                         WebkitWritingMode: dimensions.width < 768 && !isActive ? 'vertical-rl' : 'horizontal-tb',
@@ -327,6 +324,16 @@ export default function App() {
                     >
                       {card.title}
                     </h2>
+                    {/* + circle icon */}
+                    <svg
+                      width="40" height="40" viewBox="0 0 40 40"
+                      fill="none" xmlns="http://www.w3.org/2000/svg"
+                      style={{ marginTop: '25px', flexShrink: 0 }}
+                    >
+                      <circle cx="20" cy="20" r="19" stroke="white" strokeWidth="2"/>
+                      <line x1="20" y1="10" x2="20" y2="30" stroke="white" strokeWidth="2" strokeLinecap="round"/>
+                      <line x1="10" y1="20" x2="30" y2="20" stroke="white" strokeWidth="2" strokeLinecap="round"/>
+                    </svg>
                   </div>
                 </div>
 
@@ -437,23 +444,77 @@ export default function App() {
             WebkitClipPath: 'polygon(100% 100%, 0% 100%, 0% 30%, 100% 0%)'
           }}
         />
-        {/* Autoplay toggle — vertically centered, right-aligned to match logo right edge */}
+        {/* Bottom bar: legal + disclosure + autoplay toggle */}
         <div
           className="absolute inset-0 flex items-center justify-end"
           style={{ paddingRight: `${logoHorizontalMargin}px` }}
         >
-          <button
-            onClick={toggleAutoPlay}
-            className="flex items-center gap-2 text-white pointer-events-auto"
-          >
-            <span className="font-book text-sm">Autoplay</span>
-            <div className={`relative w-10 h-5 rounded-full transition-colors duration-300 ${autoPlayEnabled ? 'bg-white' : 'bg-white/30'}`}>
-              <div className={`absolute top-0.5 left-0.5 w-4 h-4 rounded-full transition-transform duration-300 ${autoPlayEnabled ? 'bg-black translate-x-5' : 'bg-white translate-x-0'}`} />
-            </div>
-          </button>
+          <div className="flex items-center pointer-events-auto">
+            {/* Legal line */}
+            <span className="font-book text-sm text-white whitespace-nowrap">
+              © JPMorgan Chase &amp; Co. 2026
+            </span>
+            {/* Disclosure button */}
+            <button
+              onClick={() => setShowDisclosure(true)}
+              className="font-book text-sm text-white whitespace-nowrap"
+              style={{
+                marginLeft: '20px',
+                border: '1px solid white',
+                padding: '2px 8px',
+                display: 'inline-block',
+                background: 'none',
+              }}
+            >
+              Disclosure
+            </button>
+            {/* Divider before autoplay toggle */}
+            <div style={{ marginLeft: '20px', marginRight: '20px', borderRight: '2px solid white', alignSelf: 'stretch' }} />
+            {/* Autoplay toggle */}
+            <button
+              onClick={toggleAutoPlay}
+              className="flex items-center gap-2 text-white"
+            >
+              <span className="font-book text-sm">Autoplay</span>
+              <div className={`relative w-10 h-5 rounded-full transition-colors duration-300 ${autoPlayEnabled ? 'bg-white' : 'bg-white/30'}`}>
+                <div className={`absolute top-0.5 left-0.5 w-4 h-4 rounded-full transition-transform duration-300 ${autoPlayEnabled ? 'bg-black translate-x-5' : 'bg-white translate-x-0'}`} />
+              </div>
+            </button>
+          </div>
         </div>
       </div>
-      
+
+      {/* Disclosure Modal */}
+      {showDisclosure && (
+        <div
+          className="fixed inset-0 z-[200] flex items-center justify-center p-6"
+          style={{ backgroundColor: 'rgba(0,0,0,0.5)' }}
+          onClick={() => setShowDisclosure(false)}
+        >
+          <div
+            className="bg-white text-black rounded-sm max-w-lg w-full p-8 relative"
+            style={{ boxShadow: '0 0 0 20px rgba(0,0,0,0.5)' }}
+            onClick={e => e.stopPropagation()}
+          >
+            <button
+              onClick={() => setShowDisclosure(false)}
+              className="absolute top-4 right-4 text-black opacity-50 hover:opacity-100"
+            >
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
+              </svg>
+            </button>
+            <h2 className="text-2xl mb-4 font-book">Disclosure</h2>
+            <p className="text-sm leading-relaxed mb-4 font-book">
+              Investing in alternative assets entails risks distinct from traditional investments. These include limited liquidity, less transparent valuations, higher volatility, and regulatory, operational, or manager-specific risks, including potential loss of principal. Investors should carefully assess these risks and their objectives before investing.
+            </p>
+            <p className="text-sm leading-relaxed font-book">
+              J.P. Morgan Asset Management is the marketing name for the asset management business of JPMorgan Chase &amp; Co., and its affiliates worldwide
+            </p>
+          </div>
+        </div>
+      )}
+
     </div>
   );
 }
