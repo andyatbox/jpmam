@@ -117,15 +117,15 @@ export default function App() {
   useEffect(() => {
     clearTimer();
     if (autoPlayEnabled) {
-      // Sequential autoplay: advance every 6s
+      // Sequential autoplay: advance every 10s
       timerRef.current = setTimeout(() => {
         setActiveCard(prev => prev === null ? 0 : (prev + 1) % CARDS.length);
       }, AUTOPLAY_DELAY);
     } else {
-      // Autoplay OFF: after 13s idle, close any open card back to default
+      // Autoplay OFF: after 15s idle, close any open card back to default
       timerRef.current = setTimeout(() => {
         setActiveCard(null);
-      }, 13000);
+      }, 15000);
     }
     return clearTimer;
   }, [autoPlayEnabled, activeCard]);
@@ -153,17 +153,25 @@ export default function App() {
     return <div className="w-screen h-screen bg-black" />;
   }
 
-  // Core calculations based on window dimensions
-  const cardHeight = Math.max(200, dimensions.height - 300);
+  // Core calculations based on window dimensions.
+  // Bar heights scale proportionally so smaller screens still expose the card area.
+  // At 1920×1080: topBarHeight=250, bottomBarHeight=150, cardTop=200, cardHeight=780 — identical to prior hardcoded values.
+  const topBarHeight = Math.min(250, Math.max(80, dimensions.height * 0.25));
+  const bottomBarHeight = Math.min(150, Math.max(50, dimensions.height * 0.15));
+  const cardTop = Math.round(topBarHeight * 0.8);
+  const cardHeight = Math.max(150, dimensions.height - cardTop - bottomBarHeight + 50);
   const defaultCardWidth = dimensions.width / CARDS.length;
   const activeCardWidth = Math.min(cardHeight, dimensions.width);
   // Matches the logo's horizontal centering margin for toggle alignment
   const logoWidth = Math.min(dimensions.width * 0.85, 1500);
   const logoHorizontalMargin = (dimensions.width - logoWidth) / 2;
 
-  // Right offset to align the close X with the right edge of the back-side content
-  // (content is max-w-2xl=672px, mx-auto, with px-6/md:px-10/lg:px-12)
-  const backScaleValue = dimensions.width >= 768 && dimensions.width < 1300 ? 0.7 : 1;
+  // Content scale: compress more aggressively on very short cards (landscape mobile)
+  const backScaleValue = (() => {
+    if (dimensions.width >= 1300) return 1;
+    if (dimensions.width < 768) return 1;
+    return cardHeight < 350 ? 0.55 : 0.7;
+  })();
   // Wrapper is wider than the card so that after scale() it visually fills edge-to-edge (scaled range only)
   const backContentWrapperWidth = activeCardWidth / backScaleValue;
   // Absolute close X for large screens (≥1300) — aligns with lg:px-12 content padding
@@ -197,9 +205,10 @@ export default function App() {
     <div className="fixed inset-0 w-screen h-screen bg-black overflow-hidden select-none font-sans text-white">
       
       {/* Top Fixed Element */}
-      <div 
-        className="fixed top-0 left-0 w-full h-[250px] pointer-events-none z-[100]"
-        style={{ 
+      <div
+        className="fixed top-0 left-0 w-full pointer-events-none z-[100]"
+        style={{
+          height: `${topBarHeight}px`,
           filter: 'drop-shadow(0 15px 15px rgba(0,0,0,0.8))',
           WebkitFilter: 'drop-shadow(0 15px 15px rgba(0,0,0,0.8))'
         }}
@@ -262,7 +271,7 @@ export default function App() {
               onClick={() => handleCardClick(index)}
               className="absolute cursor-pointer"
               style={{
-                top: '200px',
+                top: `${cardTop}px`,
                 left: `${leftPosition}px`,
                 width: `${cardWidth + 1}px`, // +1px to prevent fractional sub-pixel gaps between cards
                 height: `${cardHeight}px`,
@@ -436,8 +445,9 @@ export default function App() {
 
       {/* Bottom Fixed Element */}
       <div
-        className="fixed bottom-0 left-0 w-full h-[150px] pointer-events-none z-[100]"
+        className="fixed bottom-0 left-0 w-full pointer-events-none z-[100]"
         style={{
+          height: `${bottomBarHeight}px`,
           filter: 'drop-shadow(0 -15px 15px rgba(0,0,0,0.8))',
           WebkitFilter: 'drop-shadow(0 -15px 15px rgba(0,0,0,0.8))'
         }}
@@ -459,14 +469,16 @@ export default function App() {
           style={{ paddingRight: `${logoHorizontalMargin}px` }}
         >
           <div className="flex items-center pointer-events-auto">
-            {/* Legal line */}
-            <span className="font-book text-sm text-white whitespace-nowrap">
-              © JPMorgan Chase &amp; Co. 2026
-            </span>
+            {/* Legal line — hidden on narrow screens to avoid overflow */}
+            {dimensions.width >= 600 && (
+              <span className="font-book text-xs sm:text-sm text-white whitespace-nowrap">
+                © JPMorgan Chase &amp; Co. 2026
+              </span>
+            )}
             {/* Disclosure button */}
             <button
               onClick={() => setShowDisclosure(true)}
-              className="font-book text-sm text-white whitespace-nowrap"
+              className="font-book text-xs sm:text-sm text-white whitespace-nowrap"
               style={{
                 marginLeft: '20px',
                 border: '1px solid white',
@@ -484,7 +496,7 @@ export default function App() {
               onClick={toggleAutoPlay}
               className="flex items-center gap-2 text-white"
             >
-              <span className="font-book text-sm">Autoplay</span>
+              <span className="font-book text-xs sm:text-sm">Autoplay</span>
               <div className={`relative w-10 h-5 rounded-full transition-colors duration-300 ${autoPlayEnabled ? 'bg-white' : 'bg-white/30'}`}>
                 <div className={`absolute top-0.5 left-0.5 w-4 h-4 rounded-full transition-transform duration-300 ${autoPlayEnabled ? 'bg-black translate-x-5' : 'bg-white translate-x-0'}`} />
               </div>
