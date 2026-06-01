@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useEffect, useRef } from 'react';
-import { track } from '@vercel/analytics';
+import posthog from 'posthog-js';
 
 const CARDS = [
   {
@@ -133,7 +133,7 @@ export default function App() {
   const handleCardClick = (index: number) => {
     const isActive = activeCard === index;
     if (!isActive) {
-      track('card_click', { card: CARDS[index].title });
+      posthog.capture('card_click', { card: CARDS[index].title });
     }
     setActiveCard(isActive ? null : index);
   };

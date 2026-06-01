@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import localFont from "next/font/local";
-import { Analytics } from "@vercel/analytics/react";
+import PostHogProvider from "./PostHogProvider";
 import "./globals.css";
 
 const jpmamLight = localFont({
@@ -37,8 +37,7 @@ export default function RootLayout({
       className={`${jpmamLight.variable} ${jpmamBook.variable} antialiased`}
     >
       <body className="bg-black font-sans">
-        {children}
-        <Analytics />
+        <PostHogProvider>{children}</PostHogProvider>
       </body>
     </html>
   );
