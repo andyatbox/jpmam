@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState, useEffect, useRef } from 'react';
+import { track } from '@vercel/analytics';
 
 const CARDS = [
   {
@@ -89,7 +90,7 @@ const CARDS = [
   },
 ];
 
-const AUTOPLAY_DELAY = 6000;
+const AUTOPLAY_DELAY = 10000;
 
 export default function App() {
   const [dimensions, setDimensions] = useState({ width: 0, height: 0 });
@@ -131,6 +132,9 @@ export default function App() {
 
   const handleCardClick = (index: number) => {
     const isActive = activeCard === index;
+    if (!isActive) {
+      track('card_click', { card: CARDS[index].title });
+    }
     setActiveCard(isActive ? null : index);
   };
 

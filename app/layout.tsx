@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import localFont from "next/font/local";
+import { Analytics } from "@vercel/analytics/react";
 import "./globals.css";
 
 const jpmamLight = localFont({
@@ -35,7 +36,10 @@ export default function RootLayout({
       lang="en"
       className={`${jpmamLight.variable} ${jpmamBook.variable} antialiased`}
     >
-      <body className="bg-black font-sans">{children}</body>
+      <body className="bg-black font-sans">
+        {children}
+        <Analytics />
+      </body>
     </html>
   );
 }
