@@ -90,7 +90,7 @@ const CARDS = [
   },
 ];
 
-const AUTOPLAY_DELAY = 10000;
+const AUTOPLAY_DELAY = 20000;
 
 export default function App() {
   const [dimensions, setDimensions] = useState({ width: 0, height: 0 });
@@ -117,15 +117,15 @@ export default function App() {
   useEffect(() => {
     clearTimer();
     if (autoPlayEnabled) {
-      // Sequential autoplay: advance every 10s
+      // Sequential autoplay: advance every 20s
       timerRef.current = setTimeout(() => {
         setActiveCard(prev => prev === null ? 0 : (prev + 1) % CARDS.length);
       }, AUTOPLAY_DELAY);
     } else {
-      // Autoplay OFF: after 15s idle, close any open card back to default
+      // Autoplay OFF: after 20s idle, close any open card back to default
       timerRef.current = setTimeout(() => {
         setActiveCard(null);
-      }, 15000);
+      }, 20000);
     }
     return clearTimer;
   }, [autoPlayEnabled, activeCard]);
