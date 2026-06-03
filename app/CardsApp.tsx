@@ -9,7 +9,7 @@ const CARDS = [
     image: '/hedge-funds.jpg',
     title: 'Hedge Funds',
     paragraph:
-      "We provide niche hedge fund strategies and customized solutions across the liquidity spectrum to help investors achieve their strategic investment objectives, leveraging the scale of J.P. Morgan's platform to secure scarce capacity and negotiate competitive terms.",
+      "We provide niche hedge fund strategies and customized solutions across the liquidity spectrum to help investors achieve their strategic investment objectives, leveraging the scale of the J.P. Morgan platform to secure scarce capacity and negotiate competitive terms.",
     stats: [
       { value: '$26B', label: 'in assets under management' },
       { value: '30', label: 'years managing hedge fund strategies' },
@@ -21,7 +21,7 @@ const CARDS = [
     image: '/infrastructure.jpg',
     title: 'Infrastructure',
     paragraph:
-      "Our team makes long-term investments across the world's largest core infrastructure markets, investing at scale in essential service assets to deliver core outcomes. We primarily target investments in contracted and regulated essential services.",
+      "Our team makes long-term investments across the world’s largest core infrastructure markets, investing at scale in essential service assets to deliver core outcomes. We primarily target investments in contracted and regulated essential services.",
     stats: [
       { value: '$91B', label: 'in assets under management' },
       { value: '18', label: 'portfolio companies with over 1,000 assets' },
@@ -48,7 +48,7 @@ const CARDS = [
       'A bottom-up, opportunistic investment approach seeking the highest conviction ideas from venture to buyout across primaries, secondaries and co-investments with a focus on the small-mid market.',
     stats: [
       { value: '$37B', label: 'in assets under management' },
-      { value: '45+', label: "years' experience" },
+      { value: '45+', label: "years’ experience" },
       { value: '260+', label: 'GP relationships' },
     ],
   },
@@ -431,7 +431,7 @@ export default function App() {
 
                       {/* Disclaimer Text */}
                       <div className="font-book mt-4 md:mt-6 text-[10px] xl:text-xs text-white/50 tracking-wide">
-                        All data as of 12/31/2025
+                        All data as of 12/31/2025.
                       </div>
                     </div>
                   </div>
@@ -472,7 +472,7 @@ export default function App() {
             {/* Legal line — hidden on narrow screens to avoid overflow */}
             {dimensions.width >= 600 && (
               <span className="font-book text-xs sm:text-sm text-white whitespace-nowrap">
-                © JPMorgan Chase &amp; Co. 2026
+                ©2026 JPMorgan Chase &amp; Co.
               </span>
             )}
             {/* Disclosure button */}
@@ -530,7 +530,7 @@ export default function App() {
               Investing in alternative assets entails risks distinct from traditional investments. These include limited liquidity, less transparent valuations, higher volatility, and regulatory, operational, or manager-specific risks, including potential loss of principal. Investors should carefully assess these risks and their objectives before investing.
             </p>
             <p className="text-sm leading-relaxed font-book">
-              J.P. Morgan Asset Management is the marketing name for the asset management business of JPMorgan Chase &amp; Co., and its affiliates worldwide
+              J.P. Morgan Asset Management is the marketing name for the asset management business of JPMorgan Chase &amp; Co., and its affiliates worldwide.
             </p>
           </div>
         </div>
