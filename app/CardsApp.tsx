@@ -92,6 +92,18 @@ const CARDS = [
 
 const AUTOPLAY_DELAY = 20000;
 
+// Keeps "J.P. Morgan" on one line and swaps in a serif curly apostrophe
+// (the brand font's ’ is a plain wedge).
+function typeset(text: string): React.ReactNode {
+  return text
+    .replace(/J\.P\. Morgan/g, 'J.P.\u00A0Morgan')
+    .split('’')
+    .flatMap((part, i) => (i === 0 ? [part] : [
+      <span key={i} style={{ fontFamily: 'Georgia, "Times New Roman", serif' }}>’</span>,
+      part,
+    ]));
+}
+
 export default function App() {
   const [dimensions, setDimensions] = useState({ width: 0, height: 0 });
   const [activeCard, setActiveCard] = useState<number | null>(null);
@@ -411,7 +423,7 @@ export default function App() {
                       </div>
                       
                       <p className="text-white/90 text-xs md:text-sm xl:text-lg mb-5 md:mb-6">
-                        {card.paragraph}
+                        {typeset(card.paragraph)}
                       </p>
 
                       {/* Stats Grid - 3 columns, always side-by-side. */}
@@ -424,7 +436,7 @@ export default function App() {
                               <div className="absolute left-0 top-0 h-full w-1/2" style={{ backgroundColor: '#52d8e6' }} />
                             </div>
                             <div className="text-2xl md:text-3xl xl:text-4xl text-white mb-1">{stat.value}</div>
-                            <div className="font-book text-[10px] md:text-xs xl:text-sm text-white/70">{stat.label}</div>
+                            <div className="font-book text-[10px] md:text-xs xl:text-sm text-white/70">{typeset(stat.label)}</div>
                           </div>
                         ))}
                       </div>
@@ -530,7 +542,7 @@ export default function App() {
               Investing in alternative assets entails risks distinct from traditional investments. These include limited liquidity, less transparent valuations, higher volatility, and regulatory, operational, or manager-specific risks, including potential loss of principal. Investors should carefully assess these risks and their objectives before investing.
             </p>
             <p className="text-sm leading-relaxed font-book">
-              J.P. Morgan Asset Management is the marketing name for the asset management business of JPMorgan Chase &amp; Co., and its affiliates worldwide.
+              J.P.&nbsp;Morgan Asset Management is the marketing name for the asset management business of JPMorgan Chase &amp; Co., and its affiliates worldwide.
             </p>
           </div>
         </div>
