@@ -24,7 +24,7 @@ const CARDS = [
       "Our team makes long-term investments across the world’s largest core infrastructure markets, investing at scale in essential service assets to deliver core outcomes. We primarily target investments in contracted and regulated essential services.",
     stats: [
       { value: '$91B', label: 'in assets under management' },
-      { value: '18', label: 'portfolio companies with over 1,000 assets' },
+      { value: '1,000+', label: 'infrastructure assets' },
       { value: '19+', label: 'years of experience managing private infrastructure' },
     ],
   },
@@ -55,19 +55,19 @@ const CARDS = [
   {
     id: 3,
     image: '/timberland.jpg',
-    title: 'Timberland',
+    title: 'Natural Capital',
     paragraph:
-      'We manage a timberland investment strategy for investors looking for portfolio diversification, inflation risk management and income benefits of investing in forestlands, while also capturing carbon and generating verified carbon assets (VCAs).',
+      'Investing in natural capital assets including forests, land, soil, water, biodiversity and ecosystems by blending value-add active management techniques to drive sustained attractive long-term returns.',
     stats: [
-      { value: '$11B', label: 'in assets under management' },
+      { value: '$11B', label: 'in assets under supervision' },
       { value: '1.5M+', label: 'acres under management across three continents' },
-      { value: '40+', label: 'years of experience in timberland management' },
+      { value: '40+', label: 'years of natural capital investing' },
     ],
   },
   {
     id: 2,
     image: '/transport.jpg',
-    title: 'Transport',
+    title: 'Transportation',
     paragraph:
       'We manage income-oriented investments targeting large, supply-chain-critical assets with long duration leases and inflation protection mechanisms.',
     stats: [
